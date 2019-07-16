@@ -1,8 +1,41 @@
-# Assessment: The Bitmap
+# Assessment: The Matrix
 
 ## Instructions
 
-TODO
+### Installation
+
+```bash
+yarn install
+```
+
+### Run linter and tests
+
+**Source code linter:**
+```bash
+yarn lint
+```
+
+**Lint + tests:**
+```bash
+yarn test
+```
+
+**Test + coverage report:**
+```bash
+yarn test:coverage
+```
+
+### Start the application
+
+To start the application simply run:
+```bash
+yarn start
+```
+
+To test it with an example stream of matrices:
+```bash
+cat resources/exampleInput.txt | yarn start
+```
 
 ## Summary of the test
 
@@ -18,12 +51,12 @@ The input has the following format:
 # Main definition:
 <numberOfTests: int> # Amount of test cases
 <n1: int> <m1: int>  # 'Columns' and 'rows' of the following bitmap
-<bitmap1: Bitmap>    # A bitmap of size n1 x m1
+<bitmap1: Matrix>    # A bitmap of size n1 x m1
 ...
 <nN: int> <mN: int>  # Repeated depending of the value of numberOfTests
-<bitmapN: Bitmap>
+<bitmapN: Matrix>
 
-# Bitmap definition (depending of n and m)
+# Matrix definition (depending of n and m)
 <value(1,1): BitmapBoolean>...<value(n,1): BitmapBoolean>
 ...
 <value(1,m): BitmapBoolean>...<value(n,m): BitmapBoolean>
@@ -64,8 +97,7 @@ Parts I'm thinking of:
 - Input stream
 - Output stream
 - Main application
-- Test case reader
-  - Bitmap reader
-- Bitmap transformer
-  - The manhattan distance formula
-- Bitmap writer
+- Matrix reader
+- Matrix transformer
+  - Using the manhattan distance formula
+- Matrix writer

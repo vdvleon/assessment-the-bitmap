@@ -1,19 +1,19 @@
 import { Readable } from "stream";
-import Bitmap from "../Bitmap/Bitmap";
-import IBitmapReader, { OnBitmapCallback } from "./IBitmapReader";
-import InvalidBitmapInputError from "./InvalidBitmapInputError";
-import InvalidBitmapInputStreamError from "./InvalidBitmapInputStreamError";
+import Matrix from "../Matrix/Matrix";
+import IMatrixReader, { OnMatrixCallback } from "./IMatrixReader";
+import InvalidMatrixInputError from "./InvalidMatrixInputError";
+import InvalidMatrixInputStreamError from "./InvalidMatrixInputStreamError";
 
 export const ENCODING = "utf8";
-export const NUMBER_OF_BITMAPS_REGEX = /^\d+$/;
-export const BITMAP_SIZE_REGEX = /^(\d+) (\d+)$/;
-export const BITMAP_ROW_REGEX = /^[01]+$/;
+export const NUMBER_OF_MATRICES_REGEX = /^\d+$/;
+export const MATRIX_SIZE_REGEX = /^(\d+) (\d+)$/;
+export const MATRIX_ROW_REGEX = /^[01]+$/;
 
-export default class BooleanBitmapReader implements IBitmapReader<boolean> {
+export default class BitmapMatrixReader implements IMatrixReader<boolean> {
     private buffer?: Buffer;
-    private numberOfBitmaps?: number;
-    private readedBitmaps: number;
-    private bitmap?: Bitmap<boolean>;
+    private numberOfMatrices?: number;
+    private readedMatrices: number;
+    private matrix?: Matrix<boolean>;
     private readedRows: number;
 
     public constructor() {
@@ -25,29 +25,29 @@ export default class BooleanBitmapReader implements IBitmapReader<boolean> {
      */
     public reset(): void {
         this.buffer = null;
-        this.numberOfBitmaps = null;
-        this.readedBitmaps = 0;
-        this.bitmap = null;
+        this.numberOfMatrices = null;
+        this.readedMatrices = 0;
+        this.matrix = null;
         this.readedRows = 0;
     }
 
     /**
-     * Read a stream of bitmaps and pass them to the onBitmapCallback.
+     * Read a stream of matrices and pass them to the onMatrixCallback.
      *
      * When ready or when an error occurred, the stream will be closed.
      *
      * @param stream
-     * @param onBitmapCallback
+     * @param onMatrixCallback
      * @return Promise resulting into true or false (success or not)
      */
     public read(
         stream: Readable,
-        onBitmapCallback: OnBitmapCallback<boolean>,
+        onMatrixCallback: OnMatrixCallback<boolean>,
     ): Promise<boolean> {
         return new Promise((resolve, reject) => {
             let finished = false;
 
-            stream.on("data", (data: Buffer): void => {
+            stream.on("data", async (data: Buffer) => {
                 if (finished) {
                     return;
                 }
@@ -59,7 +59,7 @@ export default class BooleanBitmapReader implements IBitmapReader<boolean> {
                         this.buffer = Buffer.concat([this.buffer, data]);
                     }
 
-                    if (this.parseBuffer(onBitmapCallback)) {
+                    if (await this.parseBuffer(onMatrixCallback)) {
                         stream.emit("close");
                         finished = true;
                         resolve(true);
@@ -75,7 +75,7 @@ export default class BooleanBitmapReader implements IBitmapReader<boolean> {
                 if (!finished) {
                     stream.emit("close");
                     finished = true;
-                    reject(new InvalidBitmapInputStreamError(
+                    reject(new InvalidMatrixInputStreamError(
                         "Reached end of the stream too early",
                     ));
                 }
@@ -94,33 +94,33 @@ export default class BooleanBitmapReader implements IBitmapReader<boolean> {
     }
 
     /**
-     * Parses the current buffer. When readed all bitmaps it will return true.
+     * Parses the current buffer. When readed all matrices it will return true.
      *
-     * @param onBitmapCallback
+     * @param onMatrixCallback
      * @return Ready or not
      */
-    private parseBuffer(onBitmapCallback: OnBitmapCallback<boolean>): boolean {
-        if (this.numberOfBitmaps === null && !this.parseNumberOfBitmaps()) {
+    private async parseBuffer(onMatrixCallback: OnMatrixCallback<boolean>): Promise<boolean> {
+        if (this.numberOfMatrices === null && !this.parseNumberOfMaxtrices()) {
             return false;
         }
 
-        while (this.readedBitmaps < this.numberOfBitmaps) {
-            if (this.bitmap === null && !this.parseBitmapSize()) {
+        while (this.readedMatrices < this.numberOfMatrices) {
+            if (this.matrix === null && !this.parseMatrixSize()) {
                 return false;
             }
 
-            while (this.readedRows < this.bitmap.getHeight()) {
-                if (!this.parseBitmapRow()) {
+            while (this.readedRows < this.matrix.getHeight()) {
+                if (!this.parseMatrixRow()) {
                     return false;
                 }
             }
 
-            if (this.readedRows === this.bitmap.getHeight()) {
-                onBitmapCallback(this.bitmap);
+            if (this.readedRows === this.matrix.getHeight()) {
+                await onMatrixCallback(this.matrix);
 
-                this.bitmap = null;
+                this.matrix = null;
                 this.readedRows = 0;
-                ++this.readedBitmaps;
+                ++this.readedMatrices;
             }
         }
 
@@ -128,73 +128,73 @@ export default class BooleanBitmapReader implements IBitmapReader<boolean> {
     }
 
     /**
-     * Return the number of bitmaps to read from the stream.
+     * Return the number of matrices to read from the stream.
      *
-     * @return Could parse the number of bitmaps
+     * @return Could parse the number of matrices
      */
-    private parseNumberOfBitmaps(): boolean {
+    private parseNumberOfMaxtrices(): boolean {
         const line = this.popLineFromBuffer();
         if (!line) {
             return false;
         }
 
-        if (!line.match(NUMBER_OF_BITMAPS_REGEX)) {
-            throw new InvalidBitmapInputError(line, "<numberOfBitmaps: number>");
+        if (!line.match(NUMBER_OF_MATRICES_REGEX)) {
+            throw new InvalidMatrixInputError(line, "<numberOfMatrices: number>");
         }
 
-        this.numberOfBitmaps = parseInt(line, 10);
+        this.numberOfMatrices = parseInt(line, 10);
 
         return true;
     }
 
     /**
-     * Parse the next bitmap's size (if possible).
+     * Parse the next matrix's size (if possible).
      *
-     * @return Could parse a bitmap size
+     * @return Could parse a matrix size
      */
-    private parseBitmapSize(): boolean {
+    private parseMatrixSize(): boolean {
         const line = this.popLineFromBuffer();
         if (!line) {
             return false;
         }
 
-        const match = line.match(BITMAP_SIZE_REGEX);
+        const match = line.match(MATRIX_SIZE_REGEX);
         if (!match) {
-            throw new InvalidBitmapInputError(line, "<x: number> <y: number>");
+            throw new InvalidMatrixInputError(line, "<x: number> <y: number>");
         }
 
         const width = parseInt(match[1], 10);
         const height = parseInt(match[2], 10);
 
-        this.bitmap = new Bitmap<boolean>(width, height, false);
+        this.matrix = new Matrix<boolean>(width, height, false);
 
         return true;
     }
 
     /**
-     * Parse a bitmap row (if possible).
+     * Parse a matrix row (if possible).
      *
      * @return Could parse a row
      */
-    private parseBitmapRow(): boolean {
+    private parseMatrixRow(): boolean {
         const line = this.popLineFromBuffer();
         if (!line) {
             return false;
         }
 
-        if (!line.match(BITMAP_ROW_REGEX)) {
-            throw new InvalidBitmapInputError(line, "('0' | '1')+");
+        if (!line.match(MATRIX_ROW_REGEX)) {
+            throw new InvalidMatrixInputError(line, "('0' | '1')+");
         }
 
-        if (line.length !== this.bitmap.getWidth()) {
-            throw new InvalidBitmapInputError(
+        if (line.length !== this.matrix.getWidth()) {
+            throw new InvalidMatrixInputError(
                 line,
-                `to be of length ${this.bitmap.getWidth()}`,
+                `to be of length ${this.matrix.getWidth()}`,
             );
         }
 
         for (let i = 0; i < line.length; ++i) {
-            this.bitmap.setValueAt(i, this.readedRows, line.charAt(i) === "1");
+            this.matrix.setValueAt(i, this.readedRows, line.charAt(i) === "1");
         }
 
         ++this.readedRows;
