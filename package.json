@@ -1,13 +1,18 @@
 {
   "scripts": {
-    "test": "jest",
-    "start": "ts-node src/app.ts"
+    "start": "ts-node src/app.ts",
+    "test": "yarn lint && jest",
+    "test:coverage": "jest --coverage",
+    "lint": "tslint src/**/*.ts"
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
+    "@types/node": "^12.6.3",
     "jest": "^24.8.0",
+    "stream-buffers": "^3.0.2",
     "ts-jest": "^24.0.2",
     "ts-node": "^8.3.0",
+    "tslint": "^5.18.0",
     "typescript": "^3.5.3"
   }
 }
