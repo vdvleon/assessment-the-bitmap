@@ -14,10 +14,9 @@ export default interface IMatrixReader<T> {
      *
      * @param stream Stream without any encoding (will receive buffers)
      * @param onMatrixCallback Callback which will receive every parsed matrix
-     * @return Promise resulting true (or an error)
      */
     read(
         stream: Readable,
         onMatrixCallback: OnMatrixCallback<T>,
-    ): Promise<boolean>;
+    ): Promise<void>;
 }

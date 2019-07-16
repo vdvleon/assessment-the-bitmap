@@ -5,8 +5,14 @@ export default interface IMatrixWriter<T> {
     /**
      * Write a given matrix to an output stream.
      *
-     * @param output
+     * @param stream
+     * @param errorStream Writable
      * @param matrix
      */
-    write(output: Writable, matrix: Matrix<T>): Promise<void>;
+    write(stream: Writable, errorStream: Writable, matrix: Matrix<T>): void;
+
+    /**
+     * This function returns a promise that will resolve when the queue is finished.
+     */
+    waitForQueueToFinish(): Promise<void>;
 }

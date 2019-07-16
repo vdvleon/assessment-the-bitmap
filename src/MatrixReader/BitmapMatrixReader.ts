@@ -38,12 +38,11 @@ export default class BitmapMatrixReader implements IMatrixReader<boolean> {
      *
      * @param stream
      * @param onMatrixCallback
-     * @return Promise resulting into true or false (success or not)
      */
     public read(
         stream: Readable,
         onMatrixCallback: OnMatrixCallback<boolean>,
-    ): Promise<boolean> {
+    ): Promise<void> {
         return new Promise((resolve, reject) => {
             let finished = false;
 
@@ -59,10 +58,10 @@ export default class BitmapMatrixReader implements IMatrixReader<boolean> {
                         this.buffer = Buffer.concat([this.buffer, data]);
                     }
 
-                    if (await this.parseBuffer(onMatrixCallback)) {
+                    if (this.parseBuffer(onMatrixCallback)) {
                         stream.emit("close");
                         finished = true;
-                        resolve(true);
+                        resolve();
                     }
                 } catch (err) {
                     stream.emit("close");
@@ -99,7 +98,7 @@ export default class BitmapMatrixReader implements IMatrixReader<boolean> {
      * @param onMatrixCallback
      * @return Ready or not
      */
-    private async parseBuffer(onMatrixCallback: OnMatrixCallback<boolean>): Promise<boolean> {
+    private parseBuffer(onMatrixCallback: OnMatrixCallback<boolean>): boolean {
         if (this.numberOfMatrices === null && !this.parseNumberOfMaxtrices()) {
             return false;
         }
@@ -116,7 +115,7 @@ export default class BitmapMatrixReader implements IMatrixReader<boolean> {
             }
 
             if (this.readedRows === this.matrix.getHeight()) {
-                await onMatrixCallback(this.matrix);
+                onMatrixCallback(this.matrix);
 
                 this.matrix = null;
                 this.readedRows = 0;

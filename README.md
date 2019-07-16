@@ -25,6 +25,8 @@ yarn test
 yarn test:coverage
 ```
 
+The coverage report can be found in [coverage/](coverage/) in HTML format.
+
 ### Start the application
 
 To start the application simply run:

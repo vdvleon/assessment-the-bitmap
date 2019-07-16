@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`distanceToWhiteBitmapTransformer createFromDistanceCalculator should return a bitmap to number matrix transformer 1`] = `
+Array [
+  Array [
+    0,
+    1,
+    2,
+  ],
+  Array [
+    1,
+    2,
+    3,
+  ],
+  Array [
+    2,
+    3,
+    2,
+  ],
+  Array [
+    3,
+    2,
+    1,
+  ],
+  Array [
+    2,
+    1,
+    0,
+  ],
+]
+`;
