@@ -1,9 +1,9 @@
-import InvalidCoordinateError from './InvalidCoordinateError';
+import InvalidCoordinateError from "./InvalidCoordinateError";
 
 export default class Bitmap<T> {
-    width: number;
-    height: number;
-    data: T[][];
+    private width: number;
+    private height: number;
+    private data: T[][];
 
     /**
      * Initialize a bitmap for a given size.
@@ -12,7 +12,7 @@ export default class Bitmap<T> {
      * @param height
      * @param initialValue
      */
-    constructor(width: number, height: number, initialValue: T) {
+    public constructor(width: number, height: number, initialValue: T) {
         this.width = width;
         this.height = height;
         this.data = [];
@@ -26,7 +26,19 @@ export default class Bitmap<T> {
         }
     }
 
-    setValueAt(x: number, y: number, value: T): this {
+    public getWidth(): number {
+        return this.width;
+    }
+
+    public getHeight(): number {
+        return this.height;
+    }
+
+    public getData(): T[][] {
+        return this.data;
+    }
+
+    public setValueAt(x: number, y: number, value: T): this {
         this.validateCoordinate(x, y);
 
         this.data[y][x] = value;
@@ -34,13 +46,13 @@ export default class Bitmap<T> {
         return this;
     }
 
-    getValueAt(x: number, y: number): T {
+    public getValueAt(x: number, y: number): T {
         this.validateCoordinate(x, y);
 
         return this.data[y][x];
     }
 
-    validateCoordinate(x, y) {
+    private validateCoordinate(x, y) {
         if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
             throw new InvalidCoordinateError(x, y, this.width, this.height);
         }
