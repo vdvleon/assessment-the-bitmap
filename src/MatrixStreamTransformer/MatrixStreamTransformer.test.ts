@@ -1,6 +1,6 @@
 import { Readable, Writable } from "stream";
 import Matrix from "../Matrix/Matrix";
-import IMatrixReader, {OnMatrixCallback} from "../MatrixReader/IMatrixReader";
+import IMatrixReader, { OnMatrixCallback } from "../MatrixReader/IMatrixReader";
 import { MatrixTransformer } from "../MatrixTransformer/MatrixTransformer";
 import IMatrixWriter from "../MatrixWriter/IMatrixWriter";
 import matrixStreamTransformer from "./MatrixStreamTransformer";
