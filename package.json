@@ -1,4 +1,8 @@
 {
+  "author": {
+    "email": "vdvleon@gmail.com",
+    "name": "Leon van der Veen"
+  },
   "scripts": {
     "start": "ts-node src/app.ts",
     "test": "yarn lint && jest",
