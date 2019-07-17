@@ -83,6 +83,7 @@ export default abstract class AbstractMatrixWriter<T> implements IMatrixWriter<T
                 errorStream.write(err, (error) => {
                     // Couldn't write error message, hard abort
                     if (error) {
+                        // tslint:disable-next-line:no-console
                         console.error(error);
                         process.exit(1);
                     }

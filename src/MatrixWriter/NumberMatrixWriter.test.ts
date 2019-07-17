@@ -1,8 +1,8 @@
 import { Writable } from "stream";
-import NumberMatrixWriter from "./NumberMatrixWriter";
 import Matrix from "../Matrix/Matrix";
+import NumberMatrixWriter from "./NumberMatrixWriter";
 
-describe('NumberMatrixWriter', () => {
+describe("NumberMatrixWriter", () => {
     describe("queue logic", () => {
         it("should write every item added to the queue in the right order", async () => {
             const writer = new NumberMatrixWriter();
@@ -77,7 +77,7 @@ describe('NumberMatrixWriter', () => {
             await wait(200);
 
             expect(errorLogger).toHaveBeenCalledTimes(1);
-            expect(errorLogger.mock.calls[0]).toEqual([new Error('foobar')]);
+            expect(errorLogger.mock.calls[0]).toEqual([new Error("foobar")]);
         });
     });
 });
@@ -98,7 +98,7 @@ function mockWritable(
             () => {
                 cb(callback(chuck));
             },
-            delayInMs
+            delayInMs,
         );
         return true;
     };
